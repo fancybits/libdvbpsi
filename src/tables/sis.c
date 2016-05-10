@@ -466,10 +466,12 @@ static dvbpsi_sis_cmd_splice_insert_t *
                 pos++;
             p_cmd->i_splice_time.p_next = NULL;
         }
+
         if (!p_cmd->b_program_splice_flag) {
+            if (p_data[pos] * 2 + pos > i_length - pos)
+                goto error;
+
             p_cmd->i_component_count = p_data[pos];
-            if (p_cmd->i_component_count * 2 + pos > i_length - pos)
-                p_cmd->i_component_count = i_length - pos;
 
             i_needed += (!p_cmd->b_splice_immediate_flag) ?
                         (p_cmd->i_component_count * (5 + 1) ) :
@@ -673,7 +675,7 @@ void dvbpsi_sis_sections_decode(dvbpsi_t* p_dvbpsi, dvbpsi_sis_t* p_sis,
     while (p_section)
     {
         for (p_byte = p_section->p_payload_start + 3;
-             p_byte < p_section->p_payload_end; )
+             p_byte + 14 < p_section->p_payload_end; )
         {
             p_sis->i_protocol_version = p_byte[3];
             p_sis->b_encrypted_packet = ((p_byte[4] & 0x80) == 0x80);
