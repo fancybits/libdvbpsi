@@ -439,16 +439,18 @@ static dvbpsi_sis_cmd_splice_insert_t *
         p_cmd->b_duration_flag            = (p_data[5] & 0x20);
         p_cmd->b_splice_immediate_flag    = (p_data[5] & 0x10);
 
-        uint16_t i_needed = 10 +
-            (p_cmd->b_program_splice_flag && !p_cmd->b_splice_immediate_flag) ? 1 :
-                (p_cmd->b_duration_flag ? 5 : 0);
-        if (i_length < i_needed)
+        uint16_t pos = 6;
+        uint16_t i_needed = 0;
+
+        if (p_cmd->b_program_splice_flag && !p_cmd->b_splice_immediate_flag)
+            i_needed = 1;
+        else if (p_cmd->b_duration_flag)
+            i_needed = 5;
+        if (pos + i_needed >= i_length)
             goto error;
 
-        uint16_t pos = 6;
         if (p_cmd->b_program_splice_flag && !p_cmd->b_splice_immediate_flag) {
-            i_needed += 5;
-            if (i_length < i_needed)
+            if (pos + 5 >= i_length)
                 goto error;
 
             /* splice_time () */
@@ -468,16 +470,15 @@ static dvbpsi_sis_cmd_splice_insert_t *
         }
 
         if (!p_cmd->b_program_splice_flag) {
-            if (p_data[pos] * 2 + pos > i_length - pos)
+            i_needed = 1;
+            if (!p_cmd->b_splice_immediate_flag)
+               i_needed += p_data[pos] * 6;
+            else
+               i_needed += p_data[pos];
+            if (i_needed + pos >+ i_length)
                 goto error;
 
             p_cmd->i_component_count = p_data[pos];
-
-            i_needed += (!p_cmd->b_splice_immediate_flag) ?
-                        (p_cmd->i_component_count * (5 + 1) ) :
-                        (p_cmd->i_component_count * 1);
-            if (i_length < i_needed)
-                goto error;
 
             dvbpsi_sis_component_splice_time_t *p_last = p_cmd->p_splice_time;
             for (uint8_t i = 0; i < p_cmd->i_component_count; i++) {
