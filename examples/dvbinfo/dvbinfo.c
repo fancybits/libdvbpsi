@@ -313,7 +313,11 @@ static void *dvbinfo_capture(void *data)
             continue;
         }
 
-        buffer->i_date = mdate();
+        /* if file then use current fileoffset */
+        if (param->b_file)
+            buffer->i_date = lseek(param->fd_in, 0, SEEK_CUR);
+        else
+            buffer->i_date = mdate();
 
         /* check fifo size */
         if (fifo_size(capture->fifo) >= param->threshold)
