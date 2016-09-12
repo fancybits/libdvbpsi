@@ -106,8 +106,11 @@
 /*****************************************************************************
  * Data structures
  *****************************************************************************/
-typedef struct ts_pid_s
+typedef struct ts_pid_s ts_pid_t;
+struct ts_pid_s
 {
+    ts_pid_t    *pid_pmt;
+
     /* TS header fields */
     int         i_pid;
     int         i_cc;   /* countinuity counter */
@@ -152,7 +155,7 @@ typedef struct ts_pid_s
     mtime_t     i_last_pcr;   /* last pcr seen for this pid */
     mtime_t     i_prev_received; /* capture time of previous packet for this pid */
     mtime_t     i_received;   /* last capture time for packet of this pid */
-} ts_pid_t;
+};
 
 typedef struct
 {
@@ -485,58 +488,76 @@ static void summary(FILE *fd, ts_stream_t *stream)
     mtime_t i_first_pcr = 0, i_last_pcr = 0;
     mtime_t start = 0, end = 0;
 
-    fprintf(fd, "\n---------------------------------------------------------\n");
+    fprintf(fd, "\n=========================================================\n");
     fprintf(fd, "\nSummary: Bandwidth\n");
 
-    /* Find PCR PID and get pcr timestamps */
-    for (int i_pid = 0; i_pid < 8192; i_pid++)
-    {
-        if (stream->pid[i_pid].b_pcr)
+    ts_pmt_t *pmt = stream->pmt;
+    while (pmt) {
+        /* Find PCR PID and get pcr timestamps */
+        fprintf(fd, "\n---------------------------------------------------------\n");
+        fprintf(fd, "\nFound PMT: %4d (0x%4x)\n", pmt->pid_pmt->i_pid, pmt->pid_pmt->i_pid);
+        if (!pmt->pid_pcr) {
+            fprintf(fd, "ERROR: PMT %4d (0x%4x) has no PCR defined\n",
+                        pmt->pid_pmt->i_pid, pmt->pid_pmt->i_pid);
+            /* Next PMT */
+            pmt = pmt->p_next;
+            continue;
+        }
+        fprintf(fd, "Found PCR: %4d (0x%4x)\n", pmt->pid_pcr->i_pid, pmt->pid_pcr->i_pid);
+
+        int i_pmt_pid = pmt->pid_pcr->i_pid;
+        if (stream->pid[i_pmt_pid].b_pcr)
         {
-            start = stream->pid[i_pid].i_first_pcr;
-            end = stream->pid[i_pid].i_last_pcr;
-            if (stream->pid[i_pid].b_discontinuity_indicator)
+            start = stream->pid[i_pmt_pid].i_first_pcr;
+            end = stream->pid[i_pmt_pid].i_last_pcr;
+            if (stream->pid[i_pmt_pid].b_discontinuity_indicator)
             {
                 fprintf(fd, "PCR discontinuity was signalled for PID: %4d (0x%4x)\n",
-                       i_pid, i_pid);
+                        i_pmt_pid, i_pmt_pid);
             }
         }
-    }
 
-    for (int i_pid = 0; i_pid < 8192; i_pid++)
-    {
-        if (stream->pid[i_pid].b_seen)
+        /* */
+        for (int i_pid = 0; i_pid < 8192; i_pid++)
         {
-            fprintf(fd, "Found PID: %4d (0x%4x), DRM: %s,", i_pid, i_pid,
-                   (stream->pid[i_pid].i_transport_scrambling_control != 0x00) ? "yes" : " no" );
-
-            double bitrate = 0;
-            if ((end - start) > 0)
+            if ((stream->pid[i_pid].pid_pmt == pmt->pid_pmt) &&
+                 stream->pid[i_pid].b_seen )
             {
-                bitrate = (double) (stream->pid[i_pid].i_packets * 188 * 8) /
-                                    ((double)(end - start)/1000.0);
+                fprintf(fd, "Found PID: %4d (0x%4x), DRM: %s,", i_pid, i_pid,
+                        (stream->pid[i_pid].i_transport_scrambling_control != 0x00) ? "yes" : " no" );
+
+                double bitrate = 0;
+                if ((end - start) > 0)
+                {
+                    bitrate = (double) (stream->pid[i_pid].i_packets * 188 * 8) /
+                              ((double)(end - start)/1000.0);
+                }
+                fprintf(fd, " bitrate %0.4f kbit/s,", bitrate);
+                fprintf(fd, " seen %"PRId64" packets",
+                        stream->pid[i_pid].i_packets);
+                fprintf(fd, "\n");
+
+                i_packets += stream->pid[i_pid].i_packets;
+                if (i_first_pcr == 0)
+                    i_first_pcr = start;
+                else
+                    i_first_pcr = (i_first_pcr < start) ? i_first_pcr : start;
+                i_last_pcr = (i_last_pcr > end) ? i_last_pcr : end;
             }
-            fprintf(fd, " bitrate %0.4f kbit/s,", bitrate);
-            fprintf(fd, " seen %"PRId64" packets",
-                   stream->pid[i_pid].i_packets);
-            fprintf(fd, "\n");
-
-            i_packets += stream->pid[i_pid].i_packets;
-            if (i_first_pcr == 0)
-                i_first_pcr = start;
-            else
-                i_first_pcr = (i_first_pcr < start) ? i_first_pcr : start;
-            i_last_pcr = (i_last_pcr > end) ? i_last_pcr : end;
         }
-    }
-    double total_bitrate = (double)(((i_packets*188) + stream->i_lost_bytes) * 8)/((double)(i_last_pcr - i_first_pcr)/1000.0);
-    fprintf(fd, "\nTotal bitrate %0.4f kbits/s\n", total_bitrate);
+        /* Print totals */
+        double total_bitrate = (double)(((i_packets*188) + stream->i_lost_bytes) * 8)/((double)(i_last_pcr - i_first_pcr)/1000.0);
+        fprintf(fd, "\nTotal bitrate %0.4f kbits/s\n", total_bitrate);
 
-    fprintf(fd, "Number of packets: %"PRId64", stuffing %"PRId64" packets, lost %"PRId64" bytes\n",
-            i_packets, stream->i_null_packets, stream->i_lost_bytes);
-    fprintf(fd, "PCR first: %"PRId64", last: %"PRId64", duration: %"PRId64"\n",
-            i_first_pcr, i_last_pcr, (mtime_t)(i_last_pcr - i_first_pcr));
-    fprintf(fd, "\n---------------------------------------------------------\n");
+        fprintf(fd, "Number of packets: %"PRId64", stuffing %"PRId64" packets, lost %"PRId64" bytes\n",
+                i_packets, stream->i_null_packets, stream->i_lost_bytes);
+        fprintf(fd, "PCR first: %"PRId64", last: %"PRId64", duration: %"PRId64"\n",
+                i_first_pcr, i_last_pcr, (mtime_t)(i_last_pcr - i_first_pcr));
+
+        /* Next PMT */
+        pmt = pmt->p_next;
+    }
+    fprintf(fd, "\n=========================================================\n");
 }
 
 static void summary_table(FILE *fd, ts_stream_t *stream)
@@ -2426,6 +2447,7 @@ static void handle_PMT(void* p_data, dvbpsi_pmt_t* p_pmt)
     printf("\t| type @ elementary_PID : Description\n");
     while(p_es)
     {
+        p_stream->pid[p_es->i_pid].pid_pmt = p->pid_pmt;
         printf("\t| 0x%02x @ pid 0x%x (%d): %s\n",
                  p_es->i_type, p_es->i_pid, p_es->i_pid,
                  GetTypeName(p_es->i_type) );
