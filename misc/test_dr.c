@@ -835,10 +835,10 @@ static int main_mpeg_iod_0(void)
   BOZO_VARS(mpeg_iod);
   BOZO_START(IOD);
 
-
+  
   #define dvbpsi_gen_mpeg_iod_dr(x,y) \
     dvbpsi_gen_mpeg_iod_dr(x)
-
+  
   /* check i_scope_of_iod_label */
   BOZO_init_integer(i_scope_of_iod_label, 0);
   BOZO_init_integer(i_iod_label, 0);
@@ -905,10 +905,10 @@ static int main_mpeg_fmc_0(void)
   BOZO_VARS(mpeg_fmc);
   BOZO_START(FMC);
 
-
+  
   #define dvbpsi_gen_mpeg_fmc_dr(x,y) \
     dvbpsi_gen_mpeg_fmc_dr(x)
-
+  
   /* check p_fmc */
   BOZO_init_array(i_num_fmc);
   BOZO_begin_array(p_fmc)
@@ -932,10 +932,10 @@ static int main_mpeg_ext_es_id_0(void)
   BOZO_VARS(mpeg_ext_es_id);
   BOZO_START(External_ES_ID);
 
-
+  
   #define dvbpsi_gen_mpeg_ext_es_id_dr(x,y) \
     dvbpsi_gen_mpeg_ext_es_id_dr(x)
-
+  
   /* check i_ext_es_id */
   BOZO_init_integer(i_ext_es_id, 0);
   BOZO_begin_integer(i_ext_es_id, 16)
@@ -956,10 +956,10 @@ static int main_mpeg_mux_buf_0(void)
   BOZO_VARS(mpeg_mux_buf);
   BOZO_START(MultiplexBuffer);
 
-
+  
   #define dvbpsi_gen_mpeg_mux_buf_dr(x,y) \
     dvbpsi_gen_mpeg_mux_buf_dr(x)
-
+  
   /* check i_mb_buf_size */
   BOZO_init_integer(i_mb_buf_size, 0);
   BOZO_init_integer(i_tb_leak_rate, 0);
@@ -2623,6 +2623,19 @@ static int main_dvb_terr_deliv_sys_0(void)
   return i_err;
 }
 
+/* transport stream */
+static int main_dvb_transport_stream_0(void)
+{
+  BOZO_VARS(dvb_transport_stream);
+  BOZO_START(transport stream);
+
+  
+
+  BOZO_END(transport stream);
+
+  return i_err;
+}
+
 
 /* main function */
 int main(void)
@@ -2684,6 +2697,7 @@ int main(void)
   i_err |= main_dvb_local_time_offset_0();
   i_err |= main_dvb_subtitling_0();
   i_err |= main_dvb_terr_deliv_sys_0();
+  i_err |= main_dvb_transport_stream_0();
 
   if(i_err)
     fprintf(stderr, "At least one test has FAILED !!!\n");

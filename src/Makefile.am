@@ -81,6 +81,7 @@ dvbdrinclude_HEADERS = descriptors/dvb/dr_40.h \
                      descriptors/dvb/dr_5a.h \
                      descriptors/dvb/dr_62.h \
                      descriptors/dvb/dr_66.h \
+                     descriptors/dvb/dr_67.h \
                      descriptors/dvb/dr_69.h \
                      descriptors/dvb/dr_73.h \
                      descriptors/dvb/dr_76.h \
@@ -155,6 +156,7 @@ descriptors_src = descriptors/mpeg/dr_02.c \
                   descriptors/dvb/dr_5a.c \
                   descriptors/dvb/dr_62.c \
                   descriptors/dvb/dr_66.c \
+                  descriptors/dvb/dr_67.c \
                   descriptors/dvb/dr_69.c \
                   descriptors/dvb/dr_73.c \
                   descriptors/dvb/dr_76.c \

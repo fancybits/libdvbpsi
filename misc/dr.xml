@@ -386,4 +386,14 @@
     <integer name="i_other_frequency_flag" bitcount="1" default="0"/>
   </descriptor>
 
+  <descriptor name="transport stream" sname="dvb_transport_stream">
+    <insert>
+        <begin>
+            p_decoded.p_data[0] = 0x44;
+            p_decoded.p_data[1] = 0x56;
+            p_decoded.p_data[2] = 0x42;
+        </begin>
+    </insert>
+  </descriptor>
+
 </dr>
