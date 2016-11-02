@@ -949,7 +949,7 @@ static char const* GetDescriptorName(uint8_t tag)
     case 0x62: return "Frequency List";
     case 0x63: return "Partial Transport Stream";
     case 0x64: return "Data Broadcast";
-    case 0x65: return "CA System descriptor";
+    case 0x65: return "Scrambling descriptor";
     case 0x66: return "Data Broadcast Identifier";
     case 0x67: return "Transport Stream Identifier";
     case 0x68: return "DSNG descriptor";
@@ -1394,6 +1394,37 @@ static void DumpSubtitleDescriptor(const void *p_descriptor)
             p_subtitle_descriptor->p_subtitle[a].i_composition_page_id,
             p_subtitle_descriptor->p_subtitle[a].i_ancillary_page_id);
     }
+}
+
+static void DumpScramblingDescriptor(const void *p_descriptor)
+{
+    const dvbpsi_dvb_scrambling_dr_t *p_dr = p_descriptor;
+    const char *msg;
+    switch (p_dr->i_scrambling_mode)
+    {
+    case 0x00:
+    case 0xff: msg = "Reserved"; break;
+    case 0x01: msg = "DVB-CSA1"; break;
+    case 0x02: msg = "DVB-CSA2"; break;
+    case 0x03: msg = "DVB-CSA3 in standard mode"; break;
+    case 0x04: msg = "DVB-CSA3 in minimally enhanced mode"; break;
+    case 0x05: msg = "DVB-CSA3 in fully enhanced mode"; break;
+    default:
+        if ((p_dr->i_scrambling_mode >= 0x06) &&
+            (p_dr->i_scrambling_mode <= 0x6F))
+            msg = "Reserved";
+        else if ((p_dr->i_scrambling_mode >= 0x70) &&
+                 (p_dr->i_scrambling_mode <= 0x7F))
+            msg = "ATIS defined (ATIS-0800006, see annex J)";
+        else if ((p_dr->i_scrambling_mode >= 0x80) &&
+                 (p_dr->i_scrambling_mode <= 0xFE))
+            msg = "User defined";
+        else
+            msg = "Unknown";
+        break;
+    }
+
+    printf("scrambling mode %d (%s)\n", p_dr->i_scrambling_mode, msg);
 }
 
 static const char *AACProfileToString(dvbpsi_aac_profile_and_level_t profile)
@@ -1934,6 +1965,10 @@ static void DumpDescriptor(dvbpsi_descriptor_t *p_descriptor)
         case 0x59:
             p_decoded = dvbpsi_decode_dvb_subtitling_dr(p_descriptor);
             dump_dr_fn = DumpSubtitleDescriptor;
+            break;
+        case 0x65:
+            p_decoded = dvbpsi_decode_dvb_scrambling_dr(p_descriptor);
+            dump_dr_fn = DumpScramblingDescriptor;
             break;
     }
 
