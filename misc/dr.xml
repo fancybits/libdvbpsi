@@ -386,6 +386,10 @@
     <integer name="i_other_frequency_flag" bitcount="1" default="0"/>
   </descriptor>
 
+  <descriptor name="scrambling" sname="dvb_scrambling">
+    <integer name="i_scrambling_mode" bitcount="8" default="1" />
+  </descriptor>
+
   <descriptor name="transport stream" sname="dvb_transport_stream">
     <insert>
         <begin>

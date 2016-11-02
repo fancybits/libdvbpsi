@@ -2623,6 +2623,27 @@ static int main_dvb_terr_deliv_sys_0(void)
   return i_err;
 }
 
+/* scrambling */
+static int main_dvb_scrambling_0(void)
+{
+  BOZO_VARS(dvb_scrambling);
+  BOZO_START(scrambling);
+
+  
+  /* check i_scrambling_mode */
+  BOZO_init_integer(i_scrambling_mode, 1);
+  BOZO_begin_integer(i_scrambling_mode, 8)
+    BOZO_DOJOB(dvb_scrambling);
+    BOZO_check_integer(i_scrambling_mode, 8)
+    BOZO_CLEAN();
+  BOZO_end_integer(i_scrambling_mode, 8)
+
+
+  BOZO_END(scrambling);
+
+  return i_err;
+}
+
 /* transport stream */
 static int main_dvb_transport_stream_0(void)
 {
@@ -2697,6 +2718,7 @@ int main(void)
   i_err |= main_dvb_local_time_offset_0();
   i_err |= main_dvb_subtitling_0();
   i_err |= main_dvb_terr_deliv_sys_0();
+  i_err |= main_dvb_scrambling_0();
   i_err |= main_dvb_transport_stream_0();
 
   if(i_err)

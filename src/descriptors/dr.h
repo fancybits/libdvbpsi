@@ -62,6 +62,7 @@
 #include "dvb/dr_59.h"
 #include "dvb/dr_5a.h"
 #include "dvb/dr_62.h"
+#include "dvb/dr_65.h"
 #include "dvb/dr_66.h"
 #include "dvb/dr_67.h"
 #include "dvb/dr_69.h"

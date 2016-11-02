@@ -16,6 +16,7 @@ Changes between 1.3.0 and 2.0.0-git:
    - 0x20 MPEG External_ES_ID descriptor
    - 0x23 MPEG MultiplexBuffer descriptor
    - 0x24 Content labelling descriptor
+   - 0x65 Scrambling descriptor
    - 0x67 DVB Transport Stream descriptor
  * Fix bugs in descriptors: 0x41, 0x44, 0x4a, 0x4b, 0x53, 0x54, 0x55, 0x56, 0x59, 0xa0
  * Fix bugs in table: CA, EIT, NIT
