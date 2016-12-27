@@ -473,6 +473,8 @@ void dvbpsi_eit_sections_gather(dvbpsi_t *p_dvbpsi, dvbpsi_psi_section_t *p_sect
         }
     }
 
+    bool b_complete = dvbpsi_IsCompleteEIT(p_eit_decoder, p_section);
+
     /* Add section to EIT */
     if (!dvbpsi_AddSectionEIT(p_dvbpsi, p_eit_decoder, p_section))
     {
@@ -486,7 +488,7 @@ void dvbpsi_eit_sections_gather(dvbpsi_t *p_dvbpsi, dvbpsi_psi_section_t *p_sect
     /* FIXME: p_section has just been added to the p_eit_decoder,
      * Why do we have to explicitly check against it in dvbpsi_IsCompleteEIT() ?
      */
-    if (dvbpsi_IsCompleteEIT(p_eit_decoder, p_section))
+    if (b_complete)
     {
         assert(p_eit_decoder->pf_eit_callback);
 
