@@ -1199,11 +1199,12 @@ static void DumpSystemClockDescriptor(const void *p_descriptor)
 static void DumpComponentDescriptor(const void *p_descriptor)
 {
     const dvbpsi_dvb_component_dr_t *p_dvb_component_dr = p_descriptor;
-    printf("Stream content: %d\n", p_dvb_component_dr->i_stream_content);
-    printf("Component type: %d\n", p_dvb_component_dr->i_component_type);
-    printf("Component tag : %d\n", p_dvb_component_dr->i_component_tag);
-    printf("ISO 639 code  : %c%c%c\n", p_dvb_component_dr->i_iso_639_code[0],
+    printf("\t\tstream content: %d\n", p_dvb_component_dr->i_stream_content);
+    printf("\t\tcomponent type: %d\n", p_dvb_component_dr->i_component_type);
+    printf("\t\tcomponent tag : %d\n", p_dvb_component_dr->i_component_tag);
+    printf("\t\tISO 639 code  : %c%c%c\n", p_dvb_component_dr->i_iso_639_code[0],
            p_dvb_component_dr->i_iso_639_code[1], p_dvb_component_dr->i_iso_639_code[2]);
+    printf("\t\ttext          :");
     for (int i = 0; i < p_dvb_component_dr->i_text_length; i++) {
         printf("%c", p_dvb_component_dr->i_text[i]);
     }
@@ -1400,8 +1401,8 @@ static void DumpParentalRatingDescriptor(const void *p_descriptor)
     const dvbpsi_dvb_parental_rating_dr_t *p_parental_rating_descriptor = p_descriptor;
     printf("Parental ratings\n");
     for (int i = 0; i < p_parental_rating_descriptor->i_ratings_number; i++) {;
-        printf("\tCountry : %d\n", p_parental_rating_descriptor->p_parental_rating[i].i_country_code);
-        printf("\tRating  : %d\n", p_parental_rating_descriptor->p_parental_rating[i].i_rating);
+        printf("\t\tcountry : %d\n", p_parental_rating_descriptor->p_parental_rating[i].i_country_code);
+        printf("\t\trating  : %d\n", p_parental_rating_descriptor->p_parental_rating[i].i_rating);
     }
 }
 
@@ -1413,13 +1414,13 @@ static void DumpTeletextDescriptor(const void *p_descriptor)
     const dvbpsi_dvb_teletext_dr_t *p_teletext_descriptor = p_descriptor;
     printf("Teletext pages\n");
     for (int i = 0; i < p_teletext_descriptor->i_pages_number; i++) {
-        printf("\tISO 6392 language code: %c%c%c\n",
+        printf("\t\tISO 6392 language code: %c%c%c\n",
                p_teletext_descriptor->p_pages[i].i_iso6392_language_code[0],
                p_teletext_descriptor->p_pages[i].i_iso6392_language_code[1],
                p_teletext_descriptor->p_pages[i].i_iso6392_language_code[2]);
-        printf("\tTeletext type         : %d\n", p_teletext_descriptor->p_pages[i].i_teletext_type);
-        printf("\tTeletext magazine     : %d\n", p_teletext_descriptor->p_pages[i].i_teletext_magazine_number);
-        printf("\tTeletext page         : %d\n", p_teletext_descriptor->p_pages[i].i_teletext_page_number);
+        printf("\t\tteletext type         : %d\n", p_teletext_descriptor->p_pages[i].i_teletext_type);
+        printf("\t\tteletext magazine     : %d\n", p_teletext_descriptor->p_pages[i].i_teletext_magazine_number);
+        printf("\t\tteletext page         : %d\n", p_teletext_descriptor->p_pages[i].i_teletext_page_number);
     }
 }
 
