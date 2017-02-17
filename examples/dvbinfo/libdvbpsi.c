@@ -1406,6 +1406,24 @@ static void DumpParentalRatingDescriptor(const void *p_descriptor)
 }
 
 /*****************************************************************************
+ * DumpTeletextDescriptor
+ *****************************************************************************/
+static void DumpTeletextDescriptor(const void *p_descriptor)
+{
+    const dvbpsi_dvb_teletext_dr_t *p_teletext_descriptor = p_descriptor;
+    printf("Teletext pages\n");
+    for (int i = 0; i < p_teletext_descriptor->i_pages_number; i++) {
+        printf("\tISO 6392 language code: %c%c%c\n",
+               p_teletext_descriptor->p_pages[i].i_iso6392_language_code[0],
+               p_teletext_descriptor->p_pages[i].i_iso6392_language_code[1],
+               p_teletext_descriptor->p_pages[i].i_iso6392_language_code[2]);
+        printf("\tTeletext type         : %d\n", p_teletext_descriptor->p_pages[i].i_teletext_type);
+        printf("\tTeletext magazine     : %d\n", p_teletext_descriptor->p_pages[i].i_teletext_magazine_number);
+        printf("\tTeletext page         : %d\n", p_teletext_descriptor->p_pages[i].i_teletext_page_number);
+    }
+}
+
+/*****************************************************************************
  * DumpSubtitleDescriptor
  *****************************************************************************/
 static void DumpSubtitleDescriptor(const void *p_descriptor)
@@ -1999,6 +2017,10 @@ static void DumpDescriptor(dvbpsi_descriptor_t *p_descriptor)
         case 0x55:
             p_decoded = dvbpsi_decode_dvb_parental_rating_dr(p_descriptor);
             dump_dr_fn = DumpParentalRatingDescriptor;
+            break;
+        case 0x56:
+            p_decoded = dvbpsi_decode_dvb_teletext_dr(p_descriptor);
+            dump_dr_fn = DumpTeletextDescriptor;
             break;
         case 0x59:
             p_decoded = dvbpsi_decode_dvb_subtitling_dr(p_descriptor);
