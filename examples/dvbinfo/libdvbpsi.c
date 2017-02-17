@@ -1393,6 +1393,19 @@ static void DumpContentDescriptor(const void *p_descriptor)
 }
 
 /*****************************************************************************
+ * DumpParentalRatingDescriptor
+ *****************************************************************************/
+static void DumpParentalRatingDescriptor(const void *p_descriptor)
+{
+    const dvbpsi_dvb_parental_rating_dr_t *p_parental_rating_descriptor = p_descriptor;
+    printf("Parental ratings\n");
+    for (int i = 0; i < p_parental_rating_descriptor->i_ratings_number; i++) {;
+        printf("\tCountry : %d\n", p_parental_rating_descriptor->p_parental_rating[i].i_country_code);
+        printf("\tRating  : %d\n", p_parental_rating_descriptor->p_parental_rating[i].i_rating);
+    }
+}
+
+/*****************************************************************************
  * DumpSubtitleDescriptor
  *****************************************************************************/
 static void DumpSubtitleDescriptor(const void *p_descriptor)
@@ -1982,6 +1995,10 @@ static void DumpDescriptor(dvbpsi_descriptor_t *p_descriptor)
         case 0x54:
             p_decoded = dvbpsi_decode_dvb_content_dr(p_descriptor);
             dump_dr_fn = DumpContentDescriptor;
+            break;
+        case 0x55:
+            p_decoded = dvbpsi_decode_dvb_parental_rating_dr(p_descriptor);
+            dump_dr_fn = DumpParentalRatingDescriptor;
             break;
         case 0x59:
             p_decoded = dvbpsi_decode_dvb_subtitling_dr(p_descriptor);
