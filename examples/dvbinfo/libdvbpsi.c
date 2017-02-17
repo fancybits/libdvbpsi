@@ -1194,6 +1194,23 @@ static void DumpSystemClockDescriptor(const void *p_descriptor)
 }
 
 /*****************************************************************************
+ * DumpComponentDescriptor
+ *****************************************************************************/
+static void DumpComponentDescriptor(const void *p_descriptor)
+{
+    const dvbpsi_dvb_component_dr_t *p_dvb_component_dr = p_descriptor;
+    printf("Stream content: %d\n", p_dvb_component_dr->i_stream_content);
+    printf("Component type: %d\n", p_dvb_component_dr->i_component_type);
+    printf("Component tag : %d\n", p_dvb_component_dr->i_component_tag);
+    printf("ISO 639 code  : %c%c%c\n", p_dvb_component_dr->i_iso_639_code[0],
+           p_dvb_component_dr->i_iso_639_code[1], p_dvb_component_dr->i_iso_639_code[2]);
+    for (int i = 0; i < p_dvb_component_dr->i_text_length; i++) {
+        printf("%c", p_dvb_component_dr->i_text[i]);
+    }
+    printf("\n");
+}
+
+/*****************************************************************************
  * DumpStreamIdentifierDescriptor
  *****************************************************************************/
 static void DumpStreamIdentifierDescriptor(const void *p_descriptor)
@@ -1950,6 +1967,10 @@ static void DumpDescriptor(dvbpsi_descriptor_t *p_descriptor)
             p_decoded = dvbpsi_decode_dvb_tshifted_ev_dr(p_descriptor);
             dump_dr_fn = DumpTimeShiftedEventDescriptor;
             break;
+        case 0x50:
+            p_decoded = dvbpsi_decode_dvb_component_dr(p_descriptor);
+            dump_dr_fn = DumpComponentDescriptor;
+            break;
         case 0x52:
             p_decoded = dvbpsi_decode_dvb_stream_identifier_dr(p_descriptor);
             dump_dr_fn = DumpStreamIdentifierDescriptor;
@@ -1972,7 +1993,7 @@ static void DumpDescriptor(dvbpsi_descriptor_t *p_descriptor)
             break;
     }
 
-    if(dump_dr_fn && p_decoded)
+    if (dump_dr_fn && p_decoded)
     {
         /* call the dump function if we could decode the descriptor. */
         dump_dr_fn(p_decoded);
