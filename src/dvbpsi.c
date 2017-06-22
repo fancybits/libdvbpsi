@@ -218,6 +218,7 @@ bool dvbpsi_decoder_psi_section_add(dvbpsi_decoder_t *p_decoder, dvbpsi_psi_sect
     /* Add to end of list */
     if (p_prev->i_number < p_section->i_number)
     {
+        p_decoder->i_last_section_number = p_section->i_number;
         p_prev->p_next = p_section;
         p_section->p_next = NULL;
     }
