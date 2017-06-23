@@ -112,9 +112,7 @@ dvbpsi_demux_subdec_t *dvbpsi_NewDemuxSubDecoder(const uint8_t i_table_id,
                                                  dvbpsi_demux_gather_cb_t pf_gather,
                                                  dvbpsi_decoder_t *p_decoder)
 {
-    (void) i_table_id; (void) i_extension;
-    (void *) pf_detach; (void *) pf_gather;
-    (void *) p_decoder;
+    assert(0);
     return NULL;
 }
 
@@ -126,8 +124,6 @@ dvbpsi_demux_subdec_t *dvbpsi_NewDemuxSubDecoder(const uint8_t i_table_id,
 void dvbpsi_DeleteDemuxSubDecoder(dvbpsi_demux_subdec_t *p_subdec)
 {
     assert(0);
-    if (!p_subdec)
-        return;
 }
 
 /*****************************************************************************
@@ -135,16 +131,7 @@ void dvbpsi_DeleteDemuxSubDecoder(dvbpsi_demux_subdec_t *p_subdec)
  *****************************************************************************/
 void dvbpsi_AttachDemuxSubDecoder(dvbpsi_demux_t *p_demux, dvbpsi_demux_subdec_t *p_subdec)
 {
-    assert(p_demux);
-    assert(p_subdec);
-
-    if (!p_demux || !p_subdec)
-        abort();
-
-    dvbpsi_t *p_dvbpsi = (dvbpsi_t *)p_demux;
-    dvbpsi_decoder_t *p_dec = (dvbpsi_decoder_t *)p_subdec;
-    if (!dvbpsi_decoder_chain_add(p_dvbpsi, p_dec))
-        abort();
+    assert(0);
 }
 
 /*****************************************************************************
@@ -152,14 +139,5 @@ void dvbpsi_AttachDemuxSubDecoder(dvbpsi_demux_t *p_demux, dvbpsi_demux_subdec_t
  *****************************************************************************/
 void dvbpsi_DetachDemuxSubDecoder(dvbpsi_demux_t *p_demux, dvbpsi_demux_subdec_t *p_subdec)
 {
-    assert(p_demux);
-    assert(p_subdec);
-
-    if (!p_demux || !p_subdec)
-        abort();
-
-    dvbpsi_t *p_dvbpsi = (dvbpsi_t *)p_demux;
-    dvbpsi_decoder_t *p_dec = (dvbpsi_decoder_t *)p_subdec;
-    if (!dvbpsi_decoder_chain_remove(p_dvbpsi, p_dec))
-        abort();
+    assert(0);
 }
