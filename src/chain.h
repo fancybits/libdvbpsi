@@ -39,12 +39,12 @@
  * -----------------------------------------------------------------------------------
  * - dvbpsi_AttachDemux                     | @see dvbpsi_demux_chain_new            -
  * - dvbpsi_DetachDemux                     | @see dvbpsi_demux_chain_delete         -
- * - dvbpsi_Demux                           |                                        -
+ * - dvbpsi_Demux                           | no replacement                         -
  * - dvbpsi_demuxGetSubDecoder              | @see dvbpsi_decoder_chain_get          -
- * - dvbpsi_NewDemuxSubDecoder              |                                        -
- * - dvbpsi_AttachDemuxSubDecoder           |                                        -
- * - dvbspi_DetachDemuxSubDecoder           |                                        -
- * ------------------------------------------------------------------------------------
+ * - dvbpsi_NewDemuxSubDecoder              | no replacement                         -
+ * - dvbpsi_AttachDemuxSubDecoder           | no replacement                         -
+ * - dvbspi_DetachDemuxSubDecoder           | no replacement                         -
+ * -----------------------------------------------------------------------------------
  *
  * Note that for dvbpsi_Demux(), dvbpsi_NewDemuxSubDecoder(), dvbpsi_AttachDemuxSubDecoder(),
  * and dvbspi_DetachDemuxSubDecoder() no replacement API is available. These functions are
