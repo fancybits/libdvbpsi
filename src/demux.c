@@ -113,7 +113,7 @@ dvbpsi_demux_subdec_t *dvbpsi_NewDemuxSubDecoder(const uint8_t i_table_id,
                                                  dvbpsi_decoder_t *p_decoder)
 {
     (void) i_table_id; (void) i_extension;
-    (void *) pf_detach, (void *) pf_gather;
+    (void *) pf_detach; (void *) pf_gather;
     (void *) p_decoder;
     return NULL;
 }
