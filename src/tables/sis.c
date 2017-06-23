@@ -578,7 +578,7 @@ static dvbpsi_sis_cmd_splice_schedule_t *
     p_cmd->i_splice_count = p_data[pos++];
 
     dvbpsi_sis_splice_event_t *p_last = p_cmd->p_splice_event;
-    for (uint8_t i = 0; i < p_cmd->i_splice_count; i++) {
+    for (uint8_t i = pos; i < p_cmd->i_splice_count; i++) {
         dvbpsi_sis_splice_event_t *p_event;
         p_event = (dvbpsi_sis_splice_event_t *)calloc(1, sizeof(dvbpsi_sis_splice_event_t));
         if (!p_event) {
