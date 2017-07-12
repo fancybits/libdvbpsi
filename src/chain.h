@@ -42,17 +42,18 @@
  * - dvbpsi_Demux                           | no replacement                         -
  * - dvbpsi_demuxGetSubDecoder              | @see dvbpsi_decoder_chain_get          -
  * - dvbpsi_NewDemuxSubDecoder              | no replacement                         -
- * - dvbpsi_AttachDemuxSubDecoder           | no replacement                         -
- * - dvbspi_DetachDemuxSubDecoder           | no replacement                         -
+ * - dvbpsi_AttachDemuxSubDecoder           | @see dvbpsi_decoder_chain_add          -
+ * - dvbspi_DetachDemuxSubDecoder           | @see dvbpsi_decoder_chain_remove       -
  * -----------------------------------------------------------------------------------
  *
  * Note that for dvbpsi_Demux(), dvbpsi_NewDemuxSubDecoder(), dvbpsi_AttachDemuxSubDecoder(),
  * and dvbspi_DetachDemuxSubDecoder() no replacement API is available. These functions are
  * discontinued since the dvbpsi_subdec_t indirection has been removed. A dvbpsi_decoder_t
- * can be added in a demux chain directly. It is important to use the API call
- * dvbpsi_demux_chain_new(), since that will install the callback function
- * dvbpsi_decoder_chain_demux(). This will do the same job dvbpsi_Demux() function had in
- * the subsdecoder architecture of demux.h.
+ * can be added in a demux chain directly using dvbpsi_decoder_chain_add() or removed using
+ * dvbpsi_decoder_chain_remove() API.
+ * It is IMPORTANT to use the API call dvbpsi_demux_chain_new(), since that will install
+ * the callback function dvbpsi_decoder_chain_demux(). This will do the same job dvbpsi_Demux()
+ * function had in the subsdecoder architecture of demux.h.
  */
 
 #ifndef _DVBPSI_CHAIN_H_
