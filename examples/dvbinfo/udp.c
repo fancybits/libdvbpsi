@@ -284,16 +284,17 @@ int udp_open(const char *interface, const char *ipaddress, int port)
             continue;
         }
 
-        const struct sockaddr_storage *saddr = (const struct sockaddr_storage *)&ptr->ai_addr;
-        if (is_multicast(saddr, ptr->ai_addrlen) &&
-            mcast_connect(s_ctl, interface, saddr, ptr->ai_addrlen))
+        const struct sockaddr_storage *saddr = (const struct sockaddr_storage *)ptr->ai_addr;
+        if (is_multicast(saddr, ptr->ai_addrlen))
         {
-            close(s_ctl);
-            s_ctl = -1;
-            perror("mcast connect error");
-            continue;
+            if (!mcast_connect(s_ctl, interface, saddr, ptr->ai_addrlen))
+            {
+                close(s_ctl);
+                s_ctl = -1;
+                perror("mcast connect error");
+                continue;
+            }
         }
-
         break;
     }
 
