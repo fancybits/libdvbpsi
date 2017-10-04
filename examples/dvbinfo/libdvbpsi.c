@@ -1419,7 +1419,8 @@ static void DumpTeletextDescriptor(const void *p_descriptor)
                p_teletext_descriptor->p_pages[i].i_iso6392_language_code[1],
                p_teletext_descriptor->p_pages[i].i_iso6392_language_code[2]);
         printf("\t\tteletext type         : %d\n", p_teletext_descriptor->p_pages[i].i_teletext_type);
-        printf("\t\tteletext magazine     : %d\n", p_teletext_descriptor->p_pages[i].i_teletext_magazine_number);
+        printf("\t\tteletext magazine     : %d\n", p_teletext_descriptor->p_pages[i].i_teletext_magazine_number ? 
+                                                   p_teletext_descriptor->p_pages[i].i_teletext_magazine_number : 8 );
         printf("\t\tteletext page         : %d\n", p_teletext_descriptor->p_pages[i].i_teletext_page_number);
     }
 }
@@ -2211,7 +2212,7 @@ static void handle_atsc_MGT(void *p_data, dvbpsi_atsc_mgt_t *p_mgt)
         ts_atsc_eit_t *p = calloc(1, sizeof(ts_atsc_eit_t));
         if (p)
         {
-            /* PMT */
+            /* EIT */
             p->handle = dvbpsi_new(&dvbpsi_message, p_stream->level);
             if (p->handle == NULL)
             {
