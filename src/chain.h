@@ -132,7 +132,7 @@ bool dvbpsi_decoder_chain_remove(dvbpsi_t *p_dvbpsi, const dvbpsi_decoder_t *p_d
  * \param p_dvbpsi pointer to dvbpsi_t handle
  * \param table_id PSI table id to get
  * \param extension PSI subtable id to get
- * \return true on success, false on failure
+ * \return returns pointer to dvbpsi_decoder_t on success, or NULL on failure
  */
 dvbpsi_decoder_t *dvbpsi_decoder_chain_get(dvbpsi_t *p_dvbpsi, const uint16_t table_id, const uint16_t extension);
 
