@@ -411,6 +411,54 @@ void dvbpsi_sis_sections_gather(dvbpsi_t *p_dvbpsi, dvbpsi_psi_section_t * p_sec
     }
 }
 
+
+/*****************************************************************************
+ * dvbpsi_sis_utc_splice_time
+ *****************************************************************************
+ * extract UTC time
+ *****************************************************************************/
+static inline uint64_t dvbpsi_sis_utc_splice_time(uint8_t *p_data)
+{
+    return (((uint32_t)p_data[0] << 24) |
+            ((uint32_t)p_data[1] << 16) |
+            ((uint32_t)p_data[2] << 8)  |
+             (uint32_t)p_data[3]);
+}
+
+/*****************************************************************************
+ * dvbpsi_sis_splice_time
+ *****************************************************************************
+ * decode splice time in 90kHz clock
+ *****************************************************************************/
+static void dvbpsi_sis_splice_time(uint8_t *p_data, dvbpsi_sis_splice_time_t *p_splice_time)
+{
+    p_splice_time->b_time_specified_flag = (p_data[0] & 0x80);
+    if (p_splice_time->b_time_specified_flag) {
+        p_splice_time->i_pts_time =
+                (((uint64_t)(p_data[0] & 0x01) << 32) |
+                 ((uint64_t)p_data[1] << 24) |
+                 ((uint64_t)p_data[2] << 16) |
+                 ((uint64_t)p_data[3] <<  8) |
+                  (uint64_t)p_data[4]);
+    }
+}
+
+/*****************************************************************************
+ * dvbpsi_sis_break_duration
+ *****************************************************************************
+ * * decode break duration in 90kHz clock
+ *****************************************************************************/
+static void dvbpsi_sis_break_duration(uint8_t *p_data, dvbpsi_sis_break_duration_t *p_break_duration)
+{
+    p_break_duration->b_auto_return = (p_data[0] & 0x80);
+    p_break_duration->i_duration =
+            ((((uint64_t)p_data[0] & 0x01) << 32) |
+              ((uint64_t)p_data[1] << 24) |
+              ((uint64_t)p_data[2] << 16) |
+              ((uint64_t)p_data[3] << 8)  |
+               (uint64_t)p_data[4]);
+}
+
 /*****************************************************************************
  * dvbpsi_sis_cmd_splice_insert_decode
  *****************************************************************************
@@ -454,16 +502,9 @@ static dvbpsi_sis_cmd_splice_insert_t *
                 goto error;
 
             /* splice_time () */
-            p_cmd->i_splice_time.b_time_specified_flag = (p_data[pos] & 0x80);
-            if (p_cmd->i_splice_time.b_time_specified_flag) {
-                p_cmd->i_splice_time.i_pts_time =
-                        (((uint64_t)(p_data[pos] & 0x01) << 32) |
-                         ((uint64_t)p_data[pos + 1] << 24) |
-                         ((uint64_t)p_data[pos + 2] << 16) |
-                         ((uint64_t)p_data[pos + 3] <<  8) |
-                          (uint64_t)p_data[pos + 4]);
+            dvbpsi_sis_splice_time(&p_data[pos], &p_cmd->i_splice_time);
+            if (p_cmd->i_splice_time.b_time_specified_flag)
                 pos += 5;
-            }
             else
                 pos++;
             p_cmd->i_splice_time.p_next = NULL;
@@ -475,7 +516,7 @@ static dvbpsi_sis_cmd_splice_insert_t *
                i_needed += p_data[pos] * 6;
             else
                i_needed += p_data[pos];
-            if (i_needed + pos >+ i_length)
+            if (i_needed + pos >= i_length)
                 goto error;
 
             p_cmd->i_component_count = p_data[pos];
@@ -493,16 +534,9 @@ static dvbpsi_sis_cmd_splice_insert_t *
                 p_splice_time->i_component_tag = p_data[pos++];
                 if (!p_cmd->b_splice_immediate_flag) {
                     /* splice_time */
-                    p_splice_time->i_splice_time.b_time_specified_flag = (p_data[pos] & 0x80);
-                    if (p_splice_time->i_splice_time.b_time_specified_flag) {
-                        p_splice_time->i_splice_time.i_pts_time =
-                                (((uint64_t)(p_data[pos] & 0x01) << 32) |
-                                 ((uint64_t)p_data[pos + 1] << 24) |
-                                 ((uint64_t)p_data[pos + 2] << 16) |
-                                 ((uint64_t)p_data[pos + 3] <<  8) |
-                                  (uint64_t)p_data[pos + 4]);
+                    dvbpsi_sis_splice_time(&p_data[pos], &p_splice_time->i_splice_time);
+                    if (p_splice_time->i_splice_time.b_time_specified_flag)
                         pos += 5;
-                    }
                     else
                         pos++;
                 }
@@ -518,13 +552,7 @@ static dvbpsi_sis_cmd_splice_insert_t *
         }
         if (p_cmd->b_duration_flag) {
             /* break duration */
-            p_cmd->i_break_duration.b_auto_return = (p_data[pos] & 0x80);
-            p_cmd->i_break_duration.i_duration =
-                    ((((uint64_t)p_data[pos] & 0x01) << 32) |
-                      ((uint64_t)p_data[pos + 1] << 24) |
-                      ((uint64_t)p_data[pos + 2] << 16) |
-                      ((uint64_t)p_data[pos + 3] << 8)  |
-                       (uint64_t)p_data[pos + 4]);
+            dvbpsi_sis_break_duration(&p_data[pos], &p_cmd->i_break_duration);
             pos += 5;
         }
         p_cmd->i_unique_program_id = (((uint16_t)p_data[pos] << 8) |
@@ -597,10 +625,7 @@ static dvbpsi_sis_cmd_splice_schedule_t *
             /* 5 reserved bits */
             if (p_event->b_program_splice_flag) {
                 /* utc_splice_time */
-                p_event->i_utc_splice_time = (((uint32_t)p_data[pos  ] << 24) |
-                                              ((uint32_t)p_data[pos+1] << 16) |
-                                              ((uint32_t)p_data[pos+2] << 8)  |
-                                               (uint32_t)p_data[pos+3]);
+                p_event->i_utc_splice_time = dvbpsi_sis_utc_splice_time(&p_data[pos]);
                 pos += 4;
             }
             else { /* component */
@@ -623,7 +648,8 @@ static dvbpsi_sis_cmd_splice_schedule_t *
                         return NULL;
                     }
                     p_time->i_tag = p_data[pos++];
-                    p_time->i_utc_splice_time = p_data[pos]; /* GPS_UTC time */
+                    /* GPS_UTC time */
+                    p_time->i_utc_splice_time = dvbpsi_sis_utc_splice_time(&p_data[pos]);
                     pos += 4;
                     if (!p_event->p_component)
                         p_event->p_component = p_list = p_time;
@@ -635,13 +661,7 @@ static dvbpsi_sis_cmd_splice_schedule_t *
             }
             if (p_event->b_duration_flag) {
                 /* break duration */
-                p_event->i_break_duration.b_auto_return = (p_data[pos] & 0x80);
-                p_event->i_break_duration.i_duration =
-                        ((((uint64_t)p_data[pos] & 0x01) << 32) |
-                          ((uint64_t)p_data[pos + 1] << 24) |
-                          ((uint64_t)p_data[pos + 2] << 16) |
-                          ((uint64_t)p_data[pos + 3] << 8)  |
-                           (uint64_t)p_data[pos + 4]);
+                dvbpsi_sis_break_duration(&p_data[pos], &p_event->i_break_duration);
                 pos += 5;
             }
             p_event->i_unique_program_id = p_data[pos];
@@ -682,6 +702,10 @@ void dvbpsi_sis_sections_decode(dvbpsi_t* p_dvbpsi, dvbpsi_sis_t* p_sis,
             p_sis->b_encrypted_packet = ((p_byte[4] & 0x80) == 0x80);
             /* NOTE: cannot handle encrypted packet */
             assert(p_sis->b_encrypted_packet);
+            if (p_sis->b_encrypted_packet) {
+                dvbpsi_error(p_dvbpsi, "SIS decoder", "cannot handle encrypted packets");
+                break;
+            }
             p_sis->i_encryption_algorithm = ((p_byte[4] & 0x7E) >> 1);
             p_sis->i_pts_adjustment = ((((uint64_t)p_byte[4] & 0x01) << 32) |
                                         ((uint64_t)p_byte[5] << 24) |
@@ -817,7 +841,7 @@ dvbpsi_psi_section_t *dvbpsi_sis_sections_generate(dvbpsi_t *p_dvbpsi, dvbpsi_si
     if (p_sis->i_splice_command_length > 0xfff)
         p_sis->i_splice_command_length = 0xfff; /* truncate */
 
-    /* Handle splice_command_sections */
+    /* TODO: FIXME: Handle splice_command_sections */
     uint32_t i_cmd_start = 14;
     switch(p_sis->i_splice_command_type)
     {
