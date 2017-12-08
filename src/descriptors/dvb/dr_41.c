@@ -39,6 +39,8 @@
 
 #include "dr_41.h"
 
+#define DVBPSI_SLS_DR_MAX (84)
+
 /*****************************************************************************
  * dvbpsi_decode_dvb_service_list_dr
  *****************************************************************************/
@@ -59,7 +61,7 @@ dvbpsi_dvb_service_list_dr_t* dvbpsi_decode_dvb_service_list_dr(
     unsigned int service_count = p_descriptor->i_length / 3;
     if ((p_descriptor->i_length < 1) ||
         (p_descriptor->i_length % 3 != 0) ||
-        (service_count>63))
+        (service_count > DVBPSI_SLS_DR_MAX - 1))
       return NULL;
 
     /* Allocate memory */
@@ -91,7 +93,7 @@ dvbpsi_descriptor_t * dvbpsi_gen_dvb_service_list_dr(
                                         bool b_duplicate)
 {
     /* Check the length */
-    if (p_decoded->i_service_count > 63)
+    if (p_decoded->i_service_count > DVBPSI_SLS_DR_MAX - 1)
         return NULL;
 
     /* Create the descriptor */
