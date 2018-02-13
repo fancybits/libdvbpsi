@@ -15,7 +15,7 @@ gen_pmt_LDFLAGS = -L../src -ldvbpsi
 
 test_chain_SOURCES = test_chain.c
 test_chain_CPPFLAGS = -DDVBPSI_DIST
-test_chain_LDFLAGS = -L../src -ldvbpsi
+test_chain_LDFLAGS = -L../src -ldvbpsi -lm
 
 test_dr_SOURCES = test_dr.c
 test_dr_CPPFLAGS = -DDVBPSI_DIST
