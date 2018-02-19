@@ -116,7 +116,11 @@ bool dvbpsi_chain_demux_delete(dvbpsi_t *p_dvbpsi)
     dvbpsi_decoder_t *p_demux = p_dvbpsi->p_decoder;
     if (!p_demux) return false;
 
-    /* Get first subtable decoder */
+    /*
+     * Get first subtable decoder other then the one added in
+     * dvbpsi_chain_demux_new(). It is deleted as last step
+     * in this function.
+     */
     dvbpsi_decoder_t *p = p_demux->p_next;
     if (!p) goto out;
 
@@ -125,12 +129,19 @@ bool dvbpsi_chain_demux_delete(dvbpsi_t *p_dvbpsi)
      * which walks the list again. This is a waste of time and needs improvement
      * on the mechanism on how to create/delete and attach/detach a subtable decoder.
      */
+    dvbpsi_decoder_t *p_next;
     while (p) {
-        dvbpsi_decoder_t *p_dec = p;
-        p = p_dec->p_next;
-        if (p_dec->pf_del)
-            p_dec->pf_del(p_dvbpsi, p_dec->i_table_id, p_dec->i_extension);
-        else dvbpsi_decoder_delete(p_dec);
+        p_next = p->p_next;
+        if (p_demux->pf_del)
+            p_demux->pf_del(p_dvbpsi, p->i_table_id, p->i_extension);
+        else {
+            /*
+             * Delete decoder even when there is no pf_del() callback,
+             * otherwise memory is leaked.
+             */
+            dvbpsi_decoder_delete(p);
+        }
+        p = p_next;
     }
 
 out:
