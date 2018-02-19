@@ -234,7 +234,6 @@ void dvbpsi_decoder_delete(dvbpsi_decoder_t *p_decoder)
 {
     assert(p_decoder);
 
-
     if (p_decoder->p_sections)
     {
         dvbpsi_DeletePSISections(p_decoder->p_sections);
