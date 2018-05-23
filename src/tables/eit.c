@@ -315,9 +315,9 @@ static bool dvbpsi_CheckEIT(dvbpsi_t *p_dvbpsi, dvbpsi_eit_decoder_t *p_eit_deco
     else if (p_eit_decoder->i_last_section_number != p_section->i_last_number)
     {
         /* last_section_number */
-        dvbpsi_error(p_dvbpsi, "EIT decoder",
-                     "'last_section_number' differs"
-                     " whereas no discontinuity has occurred");
+        //dvbpsi_error(p_dvbpsi, "EIT decoder",
+        //             "'last_section_number' differs"
+        //             " whereas no discontinuity has occurred");
         b_reinit = true;
     }
 
