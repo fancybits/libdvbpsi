@@ -129,8 +129,8 @@ __attribute__((deprecated,unused))
 inline bool dvbpsi_atsc_AttachMGT(dvbpsi_t *p_dvbpsi, uint8_t i_table_id,
     uint16_t i_extension, dvbpsi_atsc_mgt_callback pf_callback, void* p_priv)
 {
-    dvbpsi_atsc_mgt_attach(p_dvbpsi, i_table_id, i_extension,
-                           pf_callback, p_priv);
+    return dvbpsi_atsc_mgt_attach(p_dvbpsi, i_table_id, i_extension,
+                                  pf_callback, p_priv);
 }
 
 /*****************************************************************************
